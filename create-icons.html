@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>生成 App 圖標</title>
+</head>
+<body>
+    <canvas id="canvas192" width="192" height="192" style="display:none;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="display:none;"></canvas>
+    
+    <script>
+        // 生成 192x192 圖標
+        const canvas192 = document.getElementById('canvas192');
+        const ctx192 = canvas192.getContext('2d');
+        
+        // 背景
+        ctx192.fillStyle = '#b8a99a';
+        ctx192.fillRect(0, 0, 192, 192);
+        
+        // 圓角背景
+        ctx192.fillStyle = '#fefdfb';
+        ctx192.beginPath();
+        ctx192.roundRect(20, 20, 152, 152, 20);
+        ctx192.fill();
+        
+        // 繪製顯微鏡圖示
+        ctx192.fillStyle = '#b8a99a';
+        ctx192.font = 'bold 100px Arial';
+        ctx192.textAlign = 'center';
+        ctx192.textBaseline = 'middle';
+        ctx192.fillText('🔬', 96, 96);
+        
+        // 生成下載鏈接
+        canvas192.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'icon-192.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+        
+        // 生成 512x512 圖標
+        const canvas512 = document.getElementById('canvas512');
+        const ctx512 = canvas512.getContext('2d');
+        
+        ctx512.fillStyle = '#b8a99a';
+        ctx512.fillRect(0, 0, 512, 512);
+        
+        ctx512.fillStyle = '#fefdfb';
+        ctx512.beginPath();
+        ctx512.roundRect(50, 50, 412, 412, 50);
+        ctx512.fill();
+        
+        ctx512.fillStyle = '#b8a99a';
+        ctx512.font = 'bold 280px Arial';
+        ctx512.textAlign = 'center';
+        ctx512.textBaseline = 'middle';
+        ctx512.fillText('🔬', 256, 256);
+        
+        setTimeout(() => {
+            canvas512.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'icon-512.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        }, 1000);
+    </script>
+    
+    <h1>圖標已生成!</h1>
+    <p>請將下載的 icon-192.png 和 icon-512.png 放在與 index.html 相同的目錄中。</p>
+</body>
+</html>

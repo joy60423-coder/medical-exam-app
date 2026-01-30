@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>醫檢國考整理系統</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #f5f5f5;
+}
+h1 { text-align: center; }
+
+.container {
+  display: flex;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  flex: 1;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+input, textarea, select, button {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: #fafafa;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.wrong { background: #ffcccc; }
+.key { background: #ffe680; }
+.mastered { background: #ccffcc; }
+
+button.small {
+  width: auto;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>醫檢師國考整理 App</h1>
+
+<div class="container">
+
+<div class="panel">
+<h3>新增題目 / 知識點</h3>
+
+<select id="category">
+<option>微生物</option>
+<option>血液學</option>
+<option>生化學</option>
+<option>免疫學</option>
+<option>寄生蟲</option>
+<option>輸血醫學</option>
+<option>其他</option>
+</select>
+
+<select id="type">
+<option value="題目">題目</option>
+<option value="知識點">知識點</option>
+</select>
+
+<textarea id="content" placeholder="輸入內容..."></textarea>
+
+<label><input type="checkbox" id="wrong"> 錯題</label>
+<label><input type="checkbox" id="key"> 重點</label>
+<label><input type="checkbox" id="mastered"> 已熟悉</label>
+
+<button onclick="addItem()">新增</button>
+</div>
+
+<div class="panel">
+<h3>搜尋 / 篩選</h3>
+
+<input id="search" placeholder="搜尋關鍵字..." oninput="render()">
+
+<select id="filter" onchange="render()">
+<option value="all">全部</option>
+<option value="wrong">只看錯題</option>
+<option value="key">只看重點</option>
+<option value="mastered">只看已熟悉</option>
+</select>
+
+<div id="list"></div>
+</div>
+
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("examData") || "[]");
+
+function save() {
+  localStorage.setItem("examData", JSON.stringify(data));
+}
+
+function addItem() {
+  const item = {
+    category: category.value,
+    type: type.value,
+    content: content.value,
+    wrong: wrong.checked,
+    key: key.checked,
+    mastered: mastered.checked,
+    id: Date.now()
+  };
+
+  if (!item.content.trim()) return;
+
+  data.push(item);
+  save();
+  content.value = "";
+  wrong.checked = key.checked = mastered.checked = false;
+  render();
+}
+
+function deleteItem(id) {
+  data = data.filter(i => i.id !== id);
+  save();
+  render();
+}
+
+function render() {
+  const keyword = search.value.toLowerCase();
+  const filterType = filter.value;
+
+  const filtered = data.filter(i => {
+    if (keyword && !i.content.toLowerCase().includes(keyword)) return false;
+    if (filterType !== "all" && !i[filterType]) return false;
+    return true;
+  });
+
+  list.innerHTML = filtered.map(i => `
+    <div class="item">
+      <b>[${i.category}] ${i.type}</b><br>
+      ${i.content}
+      <div>
+        ${i.wrong ? '<span class="tag wrong">錯題</span>' : ''}
+        ${i.key ? '<span class="tag key">重點</span>' : ''}
+        ${i.mastered ? '<span class="tag mastered">已熟悉</span>' : ''}
+      </div>
+      <button class="small" onclick="deleteItem(${i.id})">刪除</button>
+    </div>
+  `).join("");
+}
+
+render();
+</script>
+
+</body>
+</html>
